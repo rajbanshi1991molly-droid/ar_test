@@ -224,8 +224,48 @@ footer{background:var(--blush);border-top:1px solid var(--line);padding:64px 0 9
 .dock .btn{flex:1;text-align:center;padding:12px 10px}
 
 /* social side panel */
-.social{position:fixed;right:0;top:50%;z-index:14;transform:translateY(-50%);display:flex;flex-direction:column;align-items:stretch;background:var(--bronze);border-radius:16px 0 0 16px;box-shadow:-6px 8px 26px rgba(90,52,30,.28);overflow:hidden;transition:box-shadow .4s}
-.stab{all:unset;box-sizing:border-box;display:grid;place-items:center;width:46px;height:50px;cursor:pointer;color:#fff;transition:background .3s}
+.social {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  z-index: 14;
+  transform: translateY(-50%);
+  /* FIXED: Changed from column to row for horizontal layout */
+  display: flex;
+  flex-direction: row; 
+  align-items: center;
+  background: var(--bronze);
+  /* Adjusted border radius to match the new horizontal orientation */
+  border-radius: 16px 0 0 16px;
+  box-shadow: -6px 8px 26px rgba(90, 52, 30, .28);
+  /* REMOVED: overflow:hidden; so the pop-up/scale animation isn't clipped */
+  transition: box-shadow .4s;
+}
+
+.stab {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 50px;
+  cursor: pointer;
+  color: #fff;
+  /* FIXED: Added a smooth transition for the transform pop-up animation */
+  transition: background .3s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* NEW: Clean pop-up effect on hover */
+.stab: hover {
+  transform: scale(1.2);
+  z-index: 2;
+}
+
+/* NEW: Optional active state for click feedback */
+.stab: active {
+  transform: scale(0.95);
+}
+
 .stab:hover{background:var(--bronze-d)}
 .stab:focus-visible{outline:3px solid #fff;outline-offset:-5px}
 .stab svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .5s var(--ease)}
