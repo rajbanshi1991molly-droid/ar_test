@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Arshhi Admin</title>
+<style>
+:root{--bg:#fff;--blush:#fbefec;--ink:#3b2a20;--soft:#6e5b4e;--bronze:#9a6a36;--rose:#e3a0a0;--line:#ecdcd3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--blush);color:var(--ink);font:400 17px/1.6 Calibri,Carlito,"Segoe UI",system-ui,Arial,sans-serif}
+h1{margin:0 0 6px;color:var(--bronze);font-size:30px;line-height:1.2}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:28px}
+#login{max-width:400px;margin:12vh auto 0;padding:0 16px}
+#login p.s{color:var(--soft);margin:0 0 18px}
+.top{background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top div{max-width:820px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top b{font-size:22px;color:var(--bronze);margin-right:auto}
+.top a{color:var(--bronze);font-weight:700}
+#panel{display:none}
+main{max-width:820px;margin:20px auto 80px;padding:0 16px}
+fieldset{border:1px solid var(--line);border-radius:12px;margin:0 0 18px;padding:14px 16px;background:var(--bg)}
+legend{font-weight:700;color:var(--bronze);padding:0 6px;font-size:18px}
+.f{display:block;margin-bottom:12px}
+.f span{display:block;font-size:15px;color:var(--soft);margin-bottom:4px}
+input[type=text],input[type=email],input[type=password],textarea{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.btn{font:inherit;font-weight:700;cursor:pointer;border:2px solid var(--bronze);background:var(--bronze);color:#fff;border-radius:999px;padding:10px 22px}
+.btn:disabled{opacity:.6;cursor:wait}
+.sm{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--blush);color:var(--ink);border-radius:8px;padding:8px 14px}
+.link{font:inherit;background:none;border:0;color:var(--bronze);text-decoration:underline;cursor:pointer;padding:0;margin-left:14px}
+.item{border-top:1px dashed var(--line);padding-top:12px;margin-top:12px}
+.fbed{margin:6px 0 14px;padding:12px;border:1px dashed var(--line);border-radius:10px;background:var(--blush)}.fbrow{display:flex;gap:12px;align-items:flex-start;margin:12px 0}.fbp{flex:0 0 56px;width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--line);background:#fff}.fbs{flex:1;min-width:0}.fbs .f{margin:6px 0}.catprev{background:#fff;border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:15px;color:var(--soft)}.logoprev{max-width:160px;display:block;margin-bottom:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
+.msg{color:#a33;min-height:1.5em;margin:10px 0 0;font-size:15px}
+.ok{color:#2d6a3e}
+.bar{position:sticky;bottom:0;background:var(--blush);padding:12px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+:focus-visible{outline:3px solid var(--bronze);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div id="login"><div class="card">
+  <h1>Arshhi admin</h1>
+  <p class="s">Log in to edit the website.</p>
+  <label class="f"><span>Username</span><input type="text" id="em" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+  <label class="f"><span>Password</span><input type="password" id="pw" autocomplete="current-password"></label>
+  <button class="btn" id="go" type="button">Log in</button>
+  <p class="msg" id="lm" role="alert"></p>
+</div></div>
+
+<div id="panel">
+  <div class="top"><div><b>Arshhi admin</b><a href="/" target="_blank" rel="noopener">View website</a><button class="sm" id="out" type="button">Log out</button></div></div>
+  <main>
+    <div id="ed"></div>
+    <fieldset id="pwbox"><legend>Change password</legend>
+      <label class="f"><span>Current password</span><input type="password" id="pwc" autocomplete="current-password"></label>
+      <label class="f"><span>New password (at least 8 characters)</span><input type="password" id="pwn" autocomplete="new-password"></label>
+      <label class="f"><span>Repeat new password</span><input type="password" id="pwn2" autocomplete="new-password"></label>
+      <button class="sm" id="pwBtn" type="button">Change password</button>
+      <p class="msg" id="pwm" role="alert"></p>
+    </fieldset>
+    <div class="bar"><button class="btn" id="sv" type="button">Save changes</button><button class="sm" id="ck" type="button">Check what the website has</button><p class="msg" id="sm" role="alert"></p></div>
+    <p class="msg" id="ckm" role="status"></p>
+  </main>
+</div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},SK='arshhi_admin_session',w=null,sess=null;
+function mk(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function say(t,ok){var m=$('lm');m.textContent=t;m.className='msg'+(ok?' ok':'')}
+
+async function api(path,body,tok){
+  var h={'Content-Type':'application/json'};if(tok)h.Authorization='Bearer '+tok;
+  var r=await fetch(path,{method:'POST',headers:h,body:JSON.stringify(body||{})}),j={};
+  try{j=await r.json()}catch(e){}
+  j.status=r.status;return j
+}
+function keep(j){sess={t:j.token,x:j.expires};try{sessionStorage.setItem(SK,JSON.stringify(sess))}catch(e){}}
+async function login(){
+  var un=$('em').value.trim(),pw=$('pw').value;
+  if(!un||!pw){say('Enter your username and password.');return}
+  $('go').disabled=true;say('');
+  try{
+    var j=await api('/api/login',{username:un,password:pw});
+    if(j.status!==200){
+      say(j.status===401?'Wrong username or password.':j.status===429?'Too many attempts. Try again in 15 minutes.':j.error==='setup'?'Setup needed: add the Vercel settings described in SETUP.md and redeploy.':'Could not log in. Please try again.');
+      $('go').disabled=false;return}
+    keep(j);enter()
+  }catch(e){say('Could not reach the server. Check your internet connection.');$('go').disabled=false}
+}
+$('go').addEventListener('click',login);
+['em','pw'].forEach(function(i){$(i).addEventListener('keydown',function(e){if(e.key==='Enter')login()})});
+
+function leave(){try{sessionStorage.removeItem(SK)}catch(e){}location.reload()}
+$('out').addEventListener('click',leave);
+try{var s=JSON.parse(sessionStorage.getItem(SK)||'null');if(s&&s.x>Date.now()){sess=s;enter()}}catch(e){}
+
+function parseData(t){
+  var d=t.match(/<script[^>]*id="data"[^>]*>([\s\S]*?)<\/script>/i);
+  if(!d)throw 0;return JSON.parse(d[1].trim())
+}
+function S(x){return String(x==null?'':x).trim()}
+var SOC=['facebook','instagram','linkedin'];
+function norm(d){
+  d.services=d.services||[];d.steps=d.steps||[];d.reviews=d.reviews||[];d.social=d.social||{};
+  SOC.forEach(function(k){if(!d.social[k]&&d[k])d.social[k]=String(d[k])});
+  d.services.forEach(function(s){
+    if(!String(s.c||'').trim()&&s.category)s.c=String(s.category);
+    if((s.p==null||s.p==='')&&s.price!=null)s.p=String(s.price);
+    s.c=String(s.c==null?'':s.c);
+    s.p=String(s.p==null?'':s.p).replace(/^\s*(\u20B9|rs\.?|inr)\s*/i,'').trim();
+    s.l=Array.isArray(s.l)?s.l:[];s.f=Array.isArray(s.f)?s.f.filter(function(x){return x&&typeof x==='object'}).map(function(x){return{i:S(x.i),n:S(x.n),t:S(x.t)}}):[];
+  });
+  d.reviews.forEach(function(r){r.r=String(r.r==null||r.r===''?'5':r.r)});
+  return d}
+function payload(){var o=norm(JSON.parse(JSON.stringify(w)));o.services.forEach(function(s){s.f=s.f.filter(function(x){return x.i||x.t||x.n})});return o}
+async function enter(){
+  $('login').style.display='none';$('panel').style.display='block';
+  var e=$('ed');e.innerHTML='<p>Loading your website content…</p>';
+  try{
+    var r=await fetch('/api/content',{cache:'no-store'}),got=null;
+    if(r.ok){try{got=await r.json()}catch(z){}}
+    if(!got||!got.brand){var t=await (await fetch('/',{cache:'no-store'})).text();got=parseData(t)}
+    w=norm(got);draw()
+  }catch(x){e.innerHTML='';e.append(mk('p','msg','Could not load the website content. Keep index.html in the same folder as admin.html.'))}
+}
+
+function saveHint(j){
+  var s=j.status,e=j.error?' / '+j.error:'',h;
+  if(s===404)h='The save address /api/save was not found. Check that api/save.js is in the api folder and redeployed.';
+  else if(s===405)h='The server did not accept the save request.';
+  else if(s===500&&j.error==='server')h='The server could not write to the database. Check the Vercel settings: the Redis token must allow writing (not the read-only token).';
+  else if(s===500)h='The server crashed. Check the Vercel function log for api/save.';
+  else h='Unexpected answer from the server.';
+  return 'Error saving changes (server answered '+s+e+'). '+h+(j.detail?' Database says: '+j.detail:'')}
+async function save(){
+  $('sv').disabled=true;var m=$('sm');m.textContent='Saving...';m.className='msg ok';$('ckm').textContent='';
+  try{
+    var pl=payload(),sz=new TextEncoder().encode(JSON.stringify(pl)).length;
+    if(sz>880000){m.textContent='Content is too large ('+Math.round(sz/1024)+' KB, limit about 880 KB). Remove a feedback photo or use a smaller logo.';m.className='msg';$('sv').disabled=false;return}
+    var j=await api('/api/save',pl,sess.t);
+    if(j.status===200){
+      m.textContent='Changes saved successfully!';
+      var d=await verify();
+      alert(d&&d.length?'Saved, but the website did not keep everything. See the message below the buttons.':'Saved!')}
+    else{m.textContent=j.error==='auth'?'Session expired. Please log in again.':j.error==='invalid'?'Invalid data format.':j.error==='too_large'||j.status===413?'Content is too large. Try a smaller logo.':saveHint(j);m.className='msg'}}
+  catch(e){m.textContent='Could not reach the server.';m.className='msg'}
+  $('sv').disabled=false;
+}
+$('sv').addEventListener('click',save);
+
+$('pwBtn').addEventListener('click',async function(){
+  var m=$('pwm'),c=$('pwc').value,n=$('pwn').value,n2=$('pwn2').value;m.className='msg';
+  if(!sess){m.textContent='Session expired. Please log in again.';return}
+  if(!c||!n){m.textContent='Enter your current password and a new password.';return}
+  if(n.length<8){m.textContent='The new password must be at least 8 characters.';return}
+  if(n!==n2){m.textContent='The two new passwords do not match.';return}
+  $('pwBtn').disabled=true;m.className='msg ok';m.textContent='Changing...';
+  try{var j=await api('/api/password',{current:c,next:n},sess.t);
+    if(j.status===200){$('pwc').value=$('pwn').value=$('pwn2').value='';m.textContent='Password changed. Use the new password next time you log in.'}
+    else{m.className='msg';m.textContent=j.status===401?'Session expired. Please log in again.':j.status===403?'Your current password is wrong.':j.error==='short'?'The new password must be at least 8 characters.':'Could not change the password. Please try again.'}}
+  catch(e){m.className='msg';m.textContent='Could not reach the server.'}
+  $('pwBtn').disabled=false});
+
+function fld(label,obj,key,mode){var num=mode==='num';if(num)mode=null;var x=mk('label','f'),el=document.createElement(mode?'textarea':'input');if(!mode)el.type='text';if(num)el.inputMode='numeric';if(mode)el.rows=mode==='lines'?4:3;
+  el.value=mode==='lines'?(obj[key]||[]).join('\n'):(obj[key]||'');
+  el.addEventListener('input',function(){obj[key]=mode==='lines'?el.value.split('\n').map(function(s){return s.trim()}).filter(Boolean):el.value});
+  if(num)el.addEventListener('change',function(){var v=el.value.replace(/[^\d.]/g,'');if(key==='r'&&v!=='')v=String(Math.max(1,Math.min(5,Math.round(+v)||5)));el.value=v;obj[key]=v});
+  x.append(mk('span',null,label),el);return x}
+function group(t){var f=mk('fieldset');f.append(mk('legend',null,t));return f}
+function listGroup(title,arr,fields,blank,addLabel,name,extra){var fs=group(title);
+  function d(){fs.innerHTML='';fs.append(mk('legend',null,title));
+    arr.forEach(function(it,i){var box=mk('div','item');box.append(mk('b',null,name+' '+(i+1)));
+      fields.forEach(function(f){box.append(fld(f[0],it,f[1],f[2]))});if(extra)extra(box,it);
+      var rm=mk('button','sm','Remove this '+name.toLowerCase());rm.type='button';rm.onclick=function(){arr.splice(i,1);d()};box.append(rm);fs.append(box)});
+    var add=mk('button','sm',addLabel);add.type='button';add.style.marginTop='14px';add.onclick=function(){arr.push(JSON.parse(JSON.stringify(blank)));d()};fs.append(add)}
+  d();return fs}
+function urlFld(label,obj,key){var x=fld(label,obj,key),el=x.querySelector('input');el.placeholder='https://';el.addEventListener('change',function(){var v=el.value.trim();if(v&&!/^https?:\/\//i.test(v))v='https://'+v;el.value=v;obj[key]=v});return x}
+function diffs(a,b){
+  var d=[];
+  ['brand','tagline','heroTitle','heroText','phone','days','hours','address','logo'].forEach(function(k){if(S(a[k])!==S(b[k]))d.push(k==='logo'?'logo':k)});
+  SOC.forEach(function(k){if(S((a.social||{})[k])!==S((b.social||{})[k]))d.push(k+' link')});
+  function list(name,A,B,keys,title){
+    if(A.length!==B.length)d.push(name+' count: '+A.length+' here, '+B.length+' on the website');
+    for(var i=0;i<Math.min(A.length,B.length);i++)keys.forEach(function(k){
+      var x=k[0]==='l'&&k.length===1?(A[i].l||[]).join('|'):S(A[i][k[0]]),y=k[0]==='l'&&k.length===1?(B[i].l||[]).join('|'):S(B[i][k[0]]);
+      if(x!==y)d.push(title+' '+(i+1)+' '+k[1])})}
+  list('Services',a.services,b.services,[['n','name'],['s','short line'],['d','description'],['l','included list'],['c','category'],['p','price']],'Service');
+  a.services.forEach(function(s,i){var o=b.services[i];if(o&&JSON.stringify((s.f||[]).filter(function(x){return x.i||x.t||x.n}))!==JSON.stringify(o.f||[]))d.push('Service '+(i+1)+' feedback (photo, name or line)')});
+  list('Steps',a.steps,b.steps,[['t','title'],['d','text']],'Step');
+  list('Reviews',a.reviews,b.reviews,[['n','name'],['c','comment'],['r','stars']],'Review');
+  return d}
+async function verify(){
+  var m=$('ckm');if(!w)return null;m.className='msg ok';m.textContent='Checking what the website has...';
+  try{var r=await fetch('/api/content',{cache:'no-store'});
+    if(!r.ok){m.className='msg';m.textContent='The website has no saved content yet (server answered '+r.status+'). Press Save changes first.';return null}
+    var sv=norm(await r.json()),here=norm(JSON.parse(JSON.stringify(w))),d=diffs(here,sv);
+    if(d.length){m.className='msg';m.textContent='Not the same on the website: '+d.slice(0,12).join(', ')+(d.length>12?' and '+(d.length-12)+' more':'')+'. If you have not pressed Save yet, save first. If you already did, the server is not keeping these fields.'}
+    else m.textContent='The website has everything shown here.';
+    return d}
+  catch(e){m.className='msg';m.textContent='Could not reach the server.';return null}}
+$('ck').addEventListener('click',verify);
+
+function sq(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),c=document.createElement('canvas');c.width=c.height=160;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);var u=c.toDataURL('image/webp',.82);if(u.indexOf('data:image/webp')!==0)u=c.toDataURL('image/jpeg',.8);cb(u)};im.onerror=function(){alert('This picture could not be read. Please choose a JPG or PNG photo.')};im.src=r.result};r.onerror=function(){alert('Could not open that file.')};r.readAsDataURL(file)}
+function fbEditor(box,it){
+  it.f=Array.isArray(it.f)?it.f:[];
+  var wrap=mk('div','fbed');wrap.append(mk('b',null,'Client feedback shown in this service popup (up to 6): round photo, name and one line. After adding, press Save changes at the bottom.'));
+  var list=mk('div'),add=mk('button','sm','Add feedback photo');add.type='button';wrap.append(list);
+  function d(){list.innerHTML='';
+    it.f.forEach(function(e,k){var row=mk('div','fbrow'),pv=mk('img','fbp'),side=mk('div','fbs'),fi=document.createElement('input');
+      pv.alt='';pv.src=e.i||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      fi.type='file';fi.accept='image/*';fi.onchange=function(){if(fi.files&&fi.files[0])sq(fi.files[0],function(u){e.i=u;pv.src=u})};
+      var nm=fld('Client name (shown under the line)',e,'n');nm.querySelector('input').maxLength=40;var t=fld('One line of feedback (max 120 characters)',e,'t');t.querySelector('input').maxLength=120;
+      var rm=mk('button','sm','Remove this feedback');rm.type='button';rm.onclick=function(){it.f.splice(k,1);d()};
+      side.append(fi,nm,t,rm);row.append(pv,side);list.append(row)});
+    add.style.display=it.f.length>=6?'none':''}
+  add.onclick=function(){it.f.push({i:'',n:'',t:''});d()};
+  wrap.append(add);box.append(wrap);d()}
+function refreshCats(){var cs=[];(w&&w.services||[]).forEach(function(s){var c=S(s.c);if(c&&cs.indexOf(c)<0)cs.push(c)});
+  var dl=$('catlist'),cp=$('catprev');if(dl){dl.innerHTML='';cs.forEach(function(c){var o=document.createElement('option');o.value=c;dl.appendChild(o)})}
+  if(cp)cp.textContent=cs.length>1?'Filter buttons on the website: All, '+cs.join(', '):cs.length===1?'Only one category ('+cs[0]+'), so no filter buttons yet. Give at least one more service a different category.':'No categories yet, so no filter buttons. Type a category in each service (for example Hair, Skin, Nails).'}
+function svcExtra(box,it){fbEditor(box,it);[].forEach.call(box.querySelectorAll('label.f'),function(l){var sp=l.querySelector('span');if(sp&&/^Category/.test(sp.textContent))l.querySelector('input').setAttribute('list','catlist')})}
+function draw(){
+  var e=$('ed');e.innerHTML='';
+  var g=group('Business');g.append(fld('Business name',w,'brand'),fld('Tagline (shown in footer)',w,'tagline'));e.append(g);
+  g=group('Logo');var pv=mk('img','logoprev');pv.src=w.logo||'';pv.alt='Current logo';var fi=document.createElement('input');fi.type='file';fi.accept='image/*';
+  fi.onchange=function(){var f=fi.files;if(!f||!f[0])return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);var lu=c.toDataURL('image/webp',.88);if(lu.indexOf('data:image/webp')!==0)lu=c.toDataURL('image/jpeg',.85);w.logo=lu;pv.src=w.logo};im.src=r.result};r.readAsDataURL(f[0])};
+  g.append(pv,fi);e.append(g);
+  g=group('Top section');g.append(fld('Headline',w,'heroTitle'),fld('Description',w,'heroText','textarea'));e.append(g);
+  g=group('Contact');g.append(fld('Phone',w,'phone'),fld('Days open (e.g. Open every day)',w,'days'),fld('Hours (e.g. 10 am to 8 pm)',w,'hours'),fld('Address',w,'address','textarea'));e.append(g);
+  w.social=w.social||{};g=group('Social media');g.append(urlFld('Facebook page link',w.social,'facebook'),urlFld('Instagram page link',w.social,'instagram'),urlFld('LinkedIn page link',w.social,'linkedin'));e.append(g);
+  var cp=mk('p','catprev');cp.id='catprev';var dl=document.createElement('datalist');dl.id='catlist';e.append(cp,dl);
+  e.append(listGroup('Services',w.services,[['Service name','n'],['Short line (shown on the card)','s'],['Full description (shown in the popup)','d','textarea'],['What is included (one per line)','l','lines'],['Category (makes the filter buttons, for example Hair or Skin. Buttons appear when there are 2 or more different categories)','c'],['Starting price in rupees (optional, numbers only. Empty shows "Call for price")','p','num']],{n:'',s:'',d:'',l:[],c:'',p:'',f:[]},'Add service','Service',svcExtra));
+  e.oninput=refreshCats;e.onclick=function(){setTimeout(refreshCats,0)};
+  e.append(listGroup('Booking steps',w.steps,[['Step title','t'],['Step text','d','textarea']],{t:'',d:''},'Add step','Step'));
+  e.append(listGroup('Reviews',w.reviews,[['Client name','n'],['Comment text','c','textarea'],['Stars (1-5)','r','num']],{n:'',c:'',r:'5'},'Add review','Review'));
+  refreshCats();
+}
+})();
+</script>
+</body>
+</html>
