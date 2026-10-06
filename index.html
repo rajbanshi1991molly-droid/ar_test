@@ -701,6 +701,74 @@ d.addEventListener('pointermove',function(e){var n=performance.now();if(n-lt<80)
 var s=d.createElement('i');s.className='fxs';s.textContent='\u2726';s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';s.style.color=cols[(Math.random()*3)|0];s.style.fontSize=(8+Math.random()*8)+'px';d.body.appendChild(s);
 s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:.9},{transform:'translate(-50%,14px) scale(.2) rotate(90deg)',opacity:0}],{duration:900,easing:'ease-out'}).onfinish=function(){s.remove()}},{passive:true});
 })();
+  <style>
+    /* Clean, fresh container reset - Name it anything you like (e.g., .my-social-bar) */
+.social-popup-bar {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  z-index: 9999;
+  
+  /* LAYOUT: Horizontal row alignment */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+  /* DESIGN: Keep your theme variables */
+  background: var(--bronze);
+  border-radius: 8px 0 0 8px;
+  box-shadow: -4px 6px 20px rgba(90, 52, 30, 0.25);
+  overflow: hidden;
+  
+  /* HIDING STRATEGY: 
+     Pushes 70% of the bar off-screen to the right, leaving exactly 30% visible 
+     while keeping a stable cursor interaction framework. */
+  transform: translateY(-50%) translateX(70%);
+  
+  /* ANIMATION: Fluid horizontal sliding mechanism */
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* TRIGGER STATE: Smoothly reveals 100% of the bar on hover, click, or focus */
+.social-popup-bar:hover,
+.social-popup-bar:active,
+.social-popup-bar:focus-within {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* INDIVIDUAL TABS: Perfectly square, restricted strictly below your 40px limit */
+.social-popup-bar .tab-item {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  
+  /* Max size restricted to 40px */
+  width: 36px;  
+  height: 36px; 
+  
+  cursor: pointer;
+  color: #ffffff;
+}
+
+/* ICON GRAPHICS: Auto-scales vectors uniformly to sit perfectly inside the 36px frames */
+.social-popup-bar .tab-item i,
+.social-popup-bar .tab-item svg,
+.social-popup-bar .tab-item .fab {
+  font-size: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+    </style>
+    
+    </script>
 </script>
+  <div class="social-popup-bar" tabindex="0">
+  <button class="tab-item" aria-label="Facebook"><i class="fab fa-facebook-f"></i></button>
+  <button class="tab-item" aria-label="Instagram"><i class="fab fa-instagram"></i></button>
+  <button class="tab-item" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></button>
+</div>
+
 </body>
 </html>
