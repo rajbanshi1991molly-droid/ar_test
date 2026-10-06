@@ -227,7 +227,7 @@ footer{background:var(--blush);border-top:1px solid var(--line);padding:64px 0 9
 .social {
   position: fixed;
   right: -8px; /* Tucked slightly off-screen to allow the pop-out movement */
-  top: 50%;
+  top: 20%;
   z-index: 14;
   transform: translateY(-50%);
   display: flex;
@@ -630,7 +630,7 @@ return `<div class="topbar"><div class="wrap"><span>${when}</span><a href="${tel
 <section class="contact" id="contact"><div class="wrap"><h2 class="rv">Contact us</h2><p class="lead rv">Call or message to book your visit.</p><div class="cgrid"><dl class="rv"><dt>Phone</dt><dd><a class="tel" href="${tel}">${esc(d.phone)}</a></dd><dt>Hours</dt><dd>${when}</dd><dt>Address</dt><dd>${esc(d.address).replace(/\n/g,'<br>')}</dd></dl><div class="book rv" style="--d:140ms"><h3>Ready for a visit?</h3><p>Tell us the service and a time that suits you. We confirm and come to your door.</p><div class="btns"><a class="btn main" href="${tel}">Call now</a><a class="btn alt" href="${wa}" rel="noopener">WhatsApp us</a></div></div></div></div></section>
 </main>
 <footer><div class="wrap fgrid"><div><div class="fbrand">${esc(d.brand)}</div><p>${esc(d.tagline)}<br>Door to door beauty care in Kolkata, West Bengal.</p>${anySo?'<div class="fsoc">'+fs('facebook')+fs('instagram')+fs('linkedin')+'</div>':''}</div><div><h4>Explore</h4><a href="#services">Services</a><a href="#how">Booking</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></div><div><h4>Contact</h4><p>${esc(d.address).replace(/\n/g,'<br>')}</p><a href="${tel}" style="margin-top:8px">${esc(d.phone)}</a><p>${when}</p></div></div><div class="wrap copy">&copy; ${new Date().getFullYear()} ${esc(d.brand)}. All rights reserved.</div></footer>
-${anySo?`<aside class="social" id="social" aria-label="Social media"><button type="button" class="stab" id="sTab" aria-expanded="false" aria-controls="sLinks" aria-label="Follow us on social media"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><div class="slinks" id="sLinks">${sl('facebook')}${sl('instagram')}${sl('linkedin')}</div></aside>`:''}
+${anySo?`<aside class="social" id="social" aria-label="Social media"><button type="button" class="stab" id="sTab" aria-expanded="false" aria-controls="sLinks"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><div class="slinks" id="sLinks">${sl('facebook')}${sl('instagram')}${sl('linkedin')}</div></aside>`:''}
 <div class="cart" id="cart" role="region" aria-label="Selected services"><div class="ci"><b id="cN"></b><small id="cL"></small></div><span class="tot" id="cT" hidden></span><button type="button" class="clr" id="cC">Clear</button><a class="btn main" id="cW" href="#" rel="noopener">Book on WhatsApp</a></div>
 <div class="dock"><a class="btn main" href="${tel}">Call</a><a class="btn alt" href="${wa}" rel="noopener">WhatsApp</a></div>
 <dialog class="modal" id="svcModal" aria-labelledby="mTitle"><button type="button" class="x" id="mClose" aria-label="Close">&times;</button><div class="mbody"><h3 id="mTitle"></h3><p class="price" id="mP"></p><p id="mDesc"></p><h4>What's included</h4><ul id="mList"></ul><div class="mfb" id="mFb" hidden><h4>Client feedback</h4><ul class="fbl" id="mFbL"></ul></div><p class="note">Call or message us to ask about price and timing.</p><div class="btns"><a class="btn main" href="${tel}">Call now</a><a class="btn alt" id="mWa" href="#" rel="noopener">Book on WhatsApp</a></div></div></dialog>
